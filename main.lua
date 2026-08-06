@@ -1,5 +1,14 @@
-local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/iiivyne/robloxlua/refs/heads/main/lib.lua"))()
-if not lib then warn("Gagal memuat library UI!") return end
+local success, lib = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/iiivyne/robloxlua/main/lib.lua"))()
+end)
+
+if not success or not lib then
+    success, lib = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/alllazy450-sketch/test-bb-w/main/lib.lua"))()
+    end)
+end
+
+if not success or not lib then warn("Gagal memuat library UI!") return end
 
 local int = lib:CreateInterface("99 Nights in the Forest","script by lohjc","https://discord.gg/ZNTHTWx7KE","bottom left","royal")
 
