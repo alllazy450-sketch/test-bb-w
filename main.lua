@@ -1,18 +1,13 @@
 -- =====================================================
 -- 99 NIGHTS IN THE FOREST - FULL SCRIPT
--- (Rewrite + Error Handling)
+-- (Rewrite dengan Error Handling)
 -- =====================================================
 
--- LOAD UI LIBRARY
 local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/iiivyne/robloxlua/refs/heads/main/lib.lua"))()
-if not lib then
-    warn("Gagal memuat library UI!")
-    return
-end
+if not lib then warn("Gagal memuat library UI!") return end
 
 local int = lib:CreateInterface("99 Nights in the Forest","script by lohjc","https://discord.gg/ZNTHTWx7KE","bottom left","royal")
 
--- CREATE TABS
 local main = int:CreateTab("Main","main functions/script utilities","default",true)
 local autofarmss = int:CreateTab("Auto","auto farm utilities (OP)","op")
 local itemtp = int:CreateTab("Item TP/ESP","bring items to you","item")
@@ -26,9 +21,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 
--- =====================================================
 -- SAFE ZONE BASEPLATES
--- =====================================================
 local safezoneBaseplates = {}
 local baseplateSize = Vector3.new(2048, 1, 2048)
 local baseY = 100
@@ -57,9 +50,7 @@ main:CreateCheckbox("Show Safe Zone", function(enabled)
     end
 end)
 
--- =====================================================
 -- UTILITY FUNCTIONS
--- =====================================================
 local function stringToCFrame(str)
     local x, y, z = str:match("([^,]+),%s*([^,]+),%s*([^,]+)")
     return CFrame.new(tonumber(x), tonumber(y), tonumber(z))
@@ -81,9 +72,7 @@ local function teleportToTarget(cf, duration)
     end
 end
 
--- =====================================================
 -- GAME TELEPORTS
--- =====================================================
 local storyCoords = {
     { "[campsite] camp site", "0, 8, -0"},
     { "[safezone] safe zone", "0, 110, -0" }
@@ -96,9 +85,7 @@ for _, entry in ipairs(storyCoords) do
     end)
 end
 
--- =====================================================
 -- ITEM ESP
--- =====================================================
 itemtp:CreateCheckbox("Item ESP", function(state)
     local itemFolder = workspace:FindFirstChild("Items")
     if not itemFolder then warn("workspace.Items not found") return end
@@ -163,9 +150,7 @@ itemtp:CreateCheckbox("Item ESP", function(state)
     end
 end)
 
--- =====================================================
 -- TELEPORT TO ITEM (SINGLE)
--- =====================================================
 local itemFolder = workspace:WaitForChild("Items")
 local itemNames = {
     "Revolver", "Medkit", "Alien Chest", "Berry", "Bolt", "Broken Fan",
@@ -202,9 +187,7 @@ for _, itemName in ipairs(itemNames) do
     end)
 end
 
--- =====================================================
 -- BRING ITEM TO YOU (BULK)
--- =====================================================
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local remoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local rootPart = LocalPlayer.Character and LocalPlayer.Character:WaitForChild("HumanoidRootPart")
@@ -255,9 +238,7 @@ for _, itemName in ipairs(possibleItems) do
     end)
 end
 
--- =====================================================
 -- BRING CHARACTER TO YOU (MOB TP)
--- =====================================================
 local characterFolder = workspace:WaitForChild("Characters")
 local possibleCharacters = {
     "Alpha Wolf","Bear","Lost Child","Lost Child2","Lost Child3","Lost Child4",
@@ -298,9 +279,7 @@ for _, characterName in ipairs(possibleCharacters) do
     end)
 end
 
--- =====================================================
--- PLAYER SLIDERS (JumpPower & WalkSpeed)
--- =====================================================
+-- PLAYER SLIDERS
 plr:CreateSlider("jumppower", 700, 50, function(value)
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
@@ -350,9 +329,7 @@ plr:CreateCheckbox("walkspeed toggle (50)",function(toggle)
     end)
 end)
 
--- =====================================================
--- VISUALS (ESP, CHAMS, FOV)
--- =====================================================
+-- VISUALS
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local espTransparency = 0.4
@@ -508,9 +485,7 @@ vis:CreateCheckbox("FOV Circle", function(state)
     FOVCircle.Visible = state
 end)
 
--- =====================================================
--- MISC: EXTRA SCRIPTS (dengan pcall agar aman)
--- =====================================================
+-- MISC: EXTRA SCRIPTS
 local civDropdown2 = misc:CreateDropDown("Extra Scripts")
 
 civDropdown2:AddButton("infinite yield", function()
@@ -584,9 +559,7 @@ civDropdown2:AddButton("turtle spy", function()
     end)
 end)
 
--- =====================================================
--- KILL AURA (dari 99 Nights)
--- =====================================================
+-- KILL AURA
 local killAuraToggle = false
 local radius = 200
 
@@ -651,9 +624,7 @@ main:CreateSlider("Kill Aura Radius", 500, 20, function(value)
     radius = math.clamp(value, 20, 500)
 end)
 
--- =====================================================
--- AUTO FARM (CAMPFIRE, COOK, GRIND, EAT, BIOFUEL, TREES)
--- =====================================================
+-- AUTO FARM
 local itemsFolder = workspace:WaitForChild("Items")
 local remoteConsume = remoteEvents:WaitForChild("RequestConsumeItem")
 
@@ -904,9 +875,7 @@ miscdropdown:AddCheckbox("Auto Bring All Small Trees", function(checked)
     end
 end)
 
--- =====================================================
 -- STRONGHOLD TIMER & TELEPORT
--- =====================================================
 local strongholdRunning = true
 
 local function getStrongholdTimerLabel()
