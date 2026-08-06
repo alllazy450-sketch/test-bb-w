@@ -1,11 +1,16 @@
 -- =====================================================
 -- 99 NIGHTS IN THE FOREST - FULL SCRIPT
--- (Lengkap & Siap Pakai)
+-- (Rewrite + Error Handling)
 -- =====================================================
 
 -- LOAD UI LIBRARY
 local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/iiivyne/robloxlua/refs/heads/main/lib.lua"))()
-local int = lib:CreateInterface("99 Nights in the Forest","script made by lohjc","https://discord.gg/ZNTHTWx7KE","bottom left","royal")
+if not lib then
+    warn("Gagal memuat library UI!")
+    return
+end
+
+local int = lib:CreateInterface("99 Nights in the Forest","script by lohjc","https://discord.gg/ZNTHTWx7KE","bottom left","royal")
 
 -- CREATE TABS
 local main = int:CreateTab("Main","main functions/script utilities","default",true)
@@ -61,7 +66,7 @@ local function stringToCFrame(str)
 end
 
 local function teleportToTarget(cf, duration)
-    local char = game.Players.LocalPlayer.Character
+    local char = LocalPlayer.Character
     if not char then return end
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
@@ -504,9 +509,10 @@ vis:CreateCheckbox("FOV Circle", function(state)
 end)
 
 -- =====================================================
--- MISC: EXTRA SCRIPTS
+-- MISC: EXTRA SCRIPTS (dengan pcall agar aman)
 -- =====================================================
 local civDropdown2 = misc:CreateDropDown("Extra Scripts")
+
 civDropdown2:AddButton("infinite yield", function()
     pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
@@ -579,7 +585,7 @@ civDropdown2:AddButton("turtle spy", function()
 end)
 
 -- =====================================================
--- KILL AURA (DARI 99 NIGHTS)
+-- KILL AURA (dari 99 Nights)
 -- =====================================================
 local killAuraToggle = false
 local radius = 200
