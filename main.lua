@@ -1,3 +1,23 @@
+-- =====================================================
+-- BYPASS ANTI-CHEAT (Dengan pcall agar aman)
+-- =====================================================
+pcall(function()
+    game:GetService("ReplicatedStorage").Security.RemoteEvent:Destroy()
+end)
+pcall(function()
+    game:GetService("ReplicatedStorage").Security[""]:Destroy()
+end)
+pcall(function()
+    game:GetService("ReplicatedStorage").Security:Destroy()
+end)
+pcall(function()
+    game:GetService("Players").LocalPlayer.PlayerScripts.Client.DeviceChecker:Destroy()
+end)
+print("✅ Anti-Cheat bypassed!")
+
+-- =====================================================
+-- LOAD FLURIORE-UI
+-- =====================================================
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Mc4121ban/Fluriore-UI/main/source.lua"))()
 
 getgenv().Aeloe = {
@@ -15,12 +35,64 @@ getgenv().Aeloe = {
 
 local SETTINGS = getgenv().Aeloe
 
+-- =====================================================
+-- BUAT UI DENGAN FLURIORE
+-- =====================================================
 local Window = Library:MakeGui({
     NameHub = "Aeloe Parry",
     Description = "Auto Parry + Anti-Detection",
     Color = Color3.fromRGB(0, 200, 255)
 })
 
+-- Tambahkan drag untuk Window (Fluriore mungkin tidak support drag)
+local function MakeDraggable(guiObject)
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    local function onInputBegin(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = guiObject.Position
+        end
+    end
+
+    local function onInputChanged(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            guiObject.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end
+
+    local function onInputEnd(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end
+
+    guiObject.InputBegan:Connect(onInputBegin)
+    guiObject.InputChanged:Connect(onInputChanged)
+    guiObject.InputEnded:Connect(onInputEnd)
+end
+
+-- Terapkan drag ke Window (cari frame utama)
+local function SetupWindowDrag()
+    local windowFrame = Window.Frame or Window._frame or Window
+    if windowFrame and windowFrame:IsA("Frame") then
+        MakeDraggable(windowFrame)
+    end
+end
+coroutine.wrap(SetupWindowDrag)()
+
+-- =====================================================
+-- TAB & KONTROL UI
+-- =====================================================
 local MainTab = Window:CreateTab({ Name = "Utama", Icon = "rbxassetid://16932740082" })
 
 local BasicSection = MainTab:AddSection("Pengaturan Dasar")
@@ -96,6 +168,9 @@ AdvancedSection:AddToggle({
     Callback = function(v) SETTINGS.UseMouseClick = v end
 })
 
+-- =====================================================
+-- CORE SCRIPT (AUTO PARRY)
+-- =====================================================
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
@@ -281,10 +356,14 @@ Player.CharacterAdded:Connect(function()
     IsParrying = false
 end)
 
+-- =====================================================
+-- FLOATING BUTTON UNTUK TOGGLE UI (DENGAN DRAG)
+-- =====================================================
 local function CreateFloatingButton()
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "AeloeToggleGUI"
     screenGui.Parent = Player.PlayerGui
+    screenGui.ResetOnSpawn = false
 
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0, 50, 0, 50)
@@ -300,6 +379,9 @@ local function CreateFloatingButton()
     corner.CornerRadius = UDim.new(1, 0)
     corner.Parent = button
 
+    -- Drag untuk floating button
+    MakeDraggable(button)
+
     button.MouseButton1Click:Connect(function()
         Window.Enabled = not Window.Enabled
         if Window.Enabled then
@@ -313,3 +395,5 @@ local function CreateFloatingButton()
 end
 
 coroutine.wrap(CreateFloatingButton)()
+
+print("✅ Aeloe Parry loaded! Tekan L untuk toggle Auto Parry.")
