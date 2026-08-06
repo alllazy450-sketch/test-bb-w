@@ -1,8 +1,3 @@
--- =====================================================
--- 99 NIGHTS IN THE FOREST - FULL SCRIPT
--- (Rewrite dengan Error Handling)
--- =====================================================
-
 local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/iiivyne/robloxlua/refs/heads/main/lib.lua"))()
 if not lib then warn("Gagal memuat library UI!") return end
 
@@ -50,7 +45,6 @@ main:CreateCheckbox("Show Safe Zone", function(enabled)
     end
 end)
 
--- UTILITY FUNCTIONS
 local function stringToCFrame(str)
     local x, y, z = str:match("([^,]+),%s*([^,]+),%s*([^,]+)")
     return CFrame.new(tonumber(x), tonumber(y), tonumber(z))
@@ -72,7 +66,6 @@ local function teleportToTarget(cf, duration)
     end
 end
 
--- GAME TELEPORTS
 local storyCoords = {
     { "[campsite] camp site", "0, 8, -0"},
     { "[safezone] safe zone", "0, 110, -0" }
@@ -85,7 +78,6 @@ for _, entry in ipairs(storyCoords) do
     end)
 end
 
--- ITEM ESP
 itemtp:CreateCheckbox("Item ESP", function(state)
     local itemFolder = workspace:FindFirstChild("Items")
     if not itemFolder then warn("workspace.Items not found") return end
@@ -150,7 +142,6 @@ itemtp:CreateCheckbox("Item ESP", function(state)
     end
 end)
 
--- TELEPORT TO ITEM (SINGLE)
 local itemFolder = workspace:WaitForChild("Items")
 local itemNames = {
     "Revolver", "Medkit", "Alien Chest", "Berry", "Bolt", "Broken Fan",
@@ -187,7 +178,6 @@ for _, itemName in ipairs(itemNames) do
     end)
 end
 
--- BRING ITEM TO YOU (BULK)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local remoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local rootPart = LocalPlayer.Character and LocalPlayer.Character:WaitForChild("HumanoidRootPart")
@@ -238,7 +228,6 @@ for _, itemName in ipairs(possibleItems) do
     end)
 end
 
--- BRING CHARACTER TO YOU (MOB TP)
 local characterFolder = workspace:WaitForChild("Characters")
 local possibleCharacters = {
     "Alpha Wolf","Bear","Lost Child","Lost Child2","Lost Child3","Lost Child4",
@@ -279,7 +268,6 @@ for _, characterName in ipairs(possibleCharacters) do
     end)
 end
 
--- PLAYER SLIDERS
 plr:CreateSlider("jumppower", 700, 50, function(value)
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
@@ -329,7 +317,6 @@ plr:CreateCheckbox("walkspeed toggle (50)",function(toggle)
     end)
 end)
 
--- VISUALS
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local espTransparency = 0.4
@@ -464,7 +451,6 @@ for _, plr in pairs(Players:GetPlayers()) do
 end
 Players.PlayerAdded:Connect(function(plr) handlePlayerESP(plr) end)
 
--- FOV Circle
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Visible = false
 FOVCircle.Color = Color3.fromRGB(255, 255, 255)
@@ -485,81 +471,6 @@ vis:CreateCheckbox("FOV Circle", function(state)
     FOVCircle.Visible = state
 end)
 
--- MISC: EXTRA SCRIPTS
-local civDropdown2 = misc:CreateDropDown("Extra Scripts")
-
-civDropdown2:AddButton("infinite yield", function()
-    pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-    end)
-end)
-
-civDropdown2:AddButton("emote gui", function()
-    pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/dimension-sources/random-scripts-i-found/refs/heads/main/r6%20animations"))()
-    end)
-end)
-
-civDropdown2:AddButton("anti afk", function()
-    pcall(function()
-        loadstring([[
-            wait(0.5)
-            local ba=Instance.new("ScreenGui")
-            local ca=Instance.new("TextLabel")
-            local da=Instance.new("Frame")
-            local _b=Instance.new("TextLabel")
-            local ab=Instance.new("TextLabel")
-            ba.Parent=game.CoreGui
-            ba.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
-            ca.Parent=ba
-            ca.Active=true
-            ca.BackgroundColor3=Color3.new(0.176471,0.176471,0.176471)
-            ca.Draggable=true
-            ca.Position=UDim2.new(0.698610067,0,0.098096624,0)
-            ca.Size=UDim2.new(0,370,0,52)
-            ca.Font=Enum.Font.SourceSansSemibold
-            ca.Text="anti afk"
-            ca.TextColor3=Color3.new(0,1,1)
-            ca.TextSize=22
-            da.Parent=ca
-            da.BackgroundColor3=Color3.new(0.196078,0.196078,0.196078)
-            da.Position=UDim2.new(0,0,1.0192306,0)
-            da.Size=UDim2.new(0,370,0,107)
-            _b.Parent=da
-            _b.BackgroundColor3=Color3.new(0.176471,0.176471,0.176471)
-            _b.Position=UDim2.new(0,0,0.800455689,0)
-            _b.Size=UDim2.new(0,370,0,21)
-            _b.Font=Enum.Font.Arial
-            _b.Text="anti afk"
-            _b.TextColor3=Color3.new(0,1,1)
-            _b.TextSize=20
-            ab.Parent=da
-            ab.BackgroundColor3=Color3.new(0.176471,0.176471,0.176471)
-            ab.Position=UDim2.new(0,0,0.158377,0)
-            ab.Size=UDim2.new(0,370,0,44)
-            ab.Font=Enum.Font.ArialBold
-            ab.Text="status: active"
-            ab.TextColor3=Color3.new(0,1,1)
-            ab.TextSize=20
-            local bb=game:service'VirtualUser'
-            game:service'Players'.LocalPlayer.Idled:connect(function()
-                bb:CaptureController()
-                bb:ClickButton2(Vector2.new())
-                ab.Text="roblox tried to kick you but failed to do so!"
-                wait(2)
-                ab.Text="status : active"
-            end)
-        ]]()
-    end)
-end)
-
-civDropdown2:AddButton("turtle spy", function()
-    pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Turtle-Brand/Turtle-Spy/main/source.lua", true))()
-    end)
-end)
-
--- KILL AURA
 local killAuraToggle = false
 local radius = 200
 
@@ -624,7 +535,6 @@ main:CreateSlider("Kill Aura Radius", 500, 20, function(value)
     radius = math.clamp(value, 20, 500)
 end)
 
--- AUTO FARM
 local itemsFolder = workspace:WaitForChild("Items")
 local remoteConsume = remoteEvents:WaitForChild("RequestConsumeItem")
 
@@ -682,7 +592,6 @@ eatDropdown:AddCheckbox("Enable Auto Eat", function(checked) autoEatEnabled = ch
 local eatHPDropdown = autofarmss:CreateDropDown("Auto Eat (HP Bar Based)")
 eatHPDropdown:AddCheckbox("Enable Auto Eat (HP Bar Based)", function(checked) autoEatHPEnabled = checked end)
 
--- Always Feed Campfire
 coroutine.wrap(function()
     while true do
         for itemName, enabled in pairs(alwaysFeedEnabledItems) do
@@ -696,7 +605,6 @@ coroutine.wrap(function()
     end
 end)()
 
--- HP-Based Feed
 coroutine.wrap(function()
     local campfire = workspace:WaitForChild("Map"):WaitForChild("Campground"):WaitForChild("MainFire")
     local fillFrame = campfire.Center.BillboardGui.Frame.Background.Fill
@@ -719,7 +627,6 @@ coroutine.wrap(function()
     end
 end)()
 
--- Auto Cook
 coroutine.wrap(function()
     while true do
         for itemName, enabled in pairs(autoCookEnabledItems) do
@@ -733,7 +640,6 @@ coroutine.wrap(function()
     end
 end)()
 
--- Auto Grind
 coroutine.wrap(function()
     while true do
         for itemName, enabled in pairs(autoGrindEnabledItems) do
@@ -747,7 +653,6 @@ coroutine.wrap(function()
     end
 end)()
 
--- Auto Eat (3 sec)
 coroutine.wrap(function()
     while true do
         if autoEatEnabled then
@@ -764,7 +669,6 @@ coroutine.wrap(function()
     end
 end)()
 
--- Auto Eat (HP Based)
 coroutine.wrap(function()
     local hungerBar = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Interface"):WaitForChild("StatBars"):WaitForChild("HungerBar"):WaitForChild("Bar")
     while true do
@@ -789,7 +693,6 @@ coroutine.wrap(function()
     end
 end)()
 
--- Auto Biofuel
 coroutine.wrap(function()
     local biofuelProcessorPos
     while true do
@@ -811,7 +714,6 @@ coroutine.wrap(function()
     end
 end)()
 
--- Tree Teleport System
 local originalTreeCFrames = {}
 local treesBrought = false
 
@@ -875,7 +777,6 @@ miscdropdown:AddCheckbox("Auto Bring All Small Trees", function(checked)
     end
 end)
 
--- STRONGHOLD TIMER & TELEPORT
 local strongholdRunning = true
 
 local function getStrongholdTimerLabel()
