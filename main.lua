@@ -1,128 +1,99 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Mc4121ban/Fluriore-UI/main/source.lua"))()
 
 getgenv().Aeloe = {
-    ["AutoParry"] = true,
-    ["PingBased"] = true,
-    ["PingBasedOffset"] = 1.95,
-    ["DistanceToParry"] = 0.65,
-    ["EmergencyRadius"] = 10,
-    ["ClashDistance"] = 10,
-    ["ClashSpeed"] = 0.01,
-    ["NormalSpeed"] = 0.05,
-    ["Visuals"] = true
+    AutoParry = true,
+    PingBased = true,
+    PingBasedOffset = 1.95,
+    DistanceToParry = 0.65,
+    EmergencyRadius = 10,
+    ClashDistance = 10,
+    ClashSpeed = 0.01,
+    NormalSpeed = 0.05,
+    Visuals = true,
+    UseMouseClick = false
 }
 
 local SETTINGS = getgenv().Aeloe
 
 local Window = Library:MakeGui({
     NameHub = "Aeloe Parry",
-    Description = "Auto Parry untuk Battlegrounds",
+    Description = "Auto Parry + Anti-Detection",
     Color = Color3.fromRGB(0, 200, 255)
 })
 
-local MainTab = Window:CreateTab({
-    Name = "Utama",
-    Icon = "rbxassetid://16932740082"
-})
+local MainTab = Window:CreateTab({ Name = "Utama", Icon = "rbxassetid://16932740082" })
 
 local BasicSection = MainTab:AddSection("Pengaturan Dasar")
-
 BasicSection:AddToggle({
     Title = "Auto Parry",
-    Content = "Aktif/nonaktifkan parry otomatis",
+    Content = "Aktif/nonaktifkan parry",
     Default = SETTINGS.AutoParry,
-    Callback = function(state)
-        SETTINGS.AutoParry = state
-    end
+    Callback = function(v) SETTINGS.AutoParry = v end
 })
-
 BasicSection:AddToggle({
-    Title = "Prediksi Berdasarkan Ping",
-    Content = "Sesuaikan timing parry dengan ping",
+    Title = "Prediksi Ping",
+    Content = "Sesuaikan timing dengan ping",
     Default = SETTINGS.PingBased,
-    Callback = function(state)
-        SETTINGS.PingBased = state
-    end
+    Callback = function(v) SETTINGS.PingBased = v end
 })
-
 BasicSection:AddSlider({
     Title = "Offset Ping",
-    Content = "Pengali untuk prediksi ping",
-    Min = 1.0,
-    Max = 3.0,
+    Content = "Pengali prediksi ping",
+    Min = 1.0, Max = 3.0,
     Default = SETTINGS.PingBasedOffset,
-    Callback = function(value)
-        SETTINGS.PingBasedOffset = value
-    end
+    Callback = function(v) SETTINGS.PingBasedOffset = v end
 })
-
 BasicSection:AddSlider({
     Title = "Jarak Parry",
-    Content = "Jarak maksimum untuk memicu parry",
-    Min = 0.1,
-    Max = 2.0,
+    Content = "Semakin kecil semakin akurat",
+    Min = 0.1, Max = 2.0,
     Default = SETTINGS.DistanceToParry,
-    Callback = function(value)
-        SETTINGS.DistanceToParry = value
-    end
+    Callback = function(v) SETTINGS.DistanceToParry = v end
 })
-
 BasicSection:AddSlider({
     Title = "Radius Darurat",
-    Content = "Jika bola sangat dekat, paksa parry",
-    Min = 1,
-    Max = 20,
+    Content = "Paksa parry jika bola terlalu dekat",
+    Min = 1, Max = 20,
     Default = SETTINGS.EmergencyRadius,
-    Callback = function(value)
-        SETTINGS.EmergencyRadius = value
-    end
+    Callback = function(v) SETTINGS.EmergencyRadius = v end
 })
 
 local AdvancedSection = MainTab:AddSection("Pengaturan Lanjutan")
-
 AdvancedSection:AddSlider({
     Title = "Jarak Clash",
-    Content = "Jarak untuk mendeteksi clash (disarankan 8-12)",
-    Min = 5,
-    Max = 30,
+    Content = "Deteksi clash (8-12 disarankan)",
+    Min = 5, Max = 30,
     Default = SETTINGS.ClashDistance,
-    Callback = function(value)
-        SETTINGS.ClashDistance = value
-    end
+    Callback = function(v) SETTINGS.ClashDistance = v end
 })
-
 AdvancedSection:AddSlider({
     Title = "Kecepatan Clash",
     Content = "Cooldown saat clash (detik)",
-    Min = 0.001,
-    Max = 0.1,
+    Min = 0.001, Max = 0.1,
     Default = SETTINGS.ClashSpeed,
-    Callback = function(value)
-        SETTINGS.ClashSpeed = value
-    end
+    Callback = function(v) SETTINGS.ClashSpeed = v end
 })
-
 AdvancedSection:AddSlider({
     Title = "Kecepatan Normal",
-    Content = "Cooldown dalam kondisi normal (detik)",
-    Min = 0.01,
-    Max = 0.2,
+    Content = "Cooldown normal (detik)",
+    Min = 0.01, Max = 0.2,
     Default = SETTINGS.NormalSpeed,
-    Callback = function(value)
-        SETTINGS.NormalSpeed = value
-    end
+    Callback = function(v) SETTINGS.NormalSpeed = v end
 })
-
 AdvancedSection:AddToggle({
     Title = "Visual Lingkaran",
-    Content = "Tampilkan lingkaran indikator di bawah karakter",
+    Content = "Tampilkan indikator",
     Default = SETTINGS.Visuals,
-    Callback = function(state)
-        SETTINGS.Visuals = state
-        if not state and _G.AeloeCircle then
-            _G.AeloeCircle.Transparency = 1
-        end
+    Callback = function(v)
+        SETTINGS.Visuals = v
+        if not v and _G.AeloeCircle then _G.AeloeCircle.Transparency = 1 end
     end
+})
+AdvancedSection:AddToggle({
+    Title = "Gunakan mouse1click()",
+    Content = "Coba jika VirtualInputManager terdeteksi",
+    Default = SETTINGS.UseMouseClick,
+    Callback = function(v) SETTINGS.UseMouseClick = v end
 })
 
 local Players = game:GetService("Players")
@@ -137,7 +108,20 @@ local LastBallHit = nil
 local IsParrying = false
 local frameCounter = 0
 
-local BallsFolder = workspace:FindFirstChild("Balls") or workspace:WaitForChild("Balls", 5)
+local BallsFolder = workspace:FindFirstChild("Balls")
+if not BallsFolder then
+    for _, v in pairs(workspace:GetChildren()) do
+        if v.Name:lower():find("ball") and v:IsA("Folder") then
+            BallsFolder = v
+            break
+        end
+    end
+end
+if not BallsFolder then
+    BallsFolder = Instance.new("Folder")
+    BallsFolder.Name = "Balls"
+    BallsFolder.Parent = workspace
+end
 
 local NetworkStats = Stats:FindFirstChild("Network")
     and Stats.Network:FindFirstChild("ServerStatsItem")
@@ -173,7 +157,14 @@ local function GetBall()
     end
     for i = 1, #children do
         local v = children[i]
-        if v:IsA("BasePart") and v.AssemblyLinearVelocity.Magnitude > 15 then return v end
+        if v:IsA("BasePart") and v.AssemblyLinearVelocity.Magnitude > 15 then
+            return v
+        end
+    end
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and v.Name:lower():find("ball") and v.AssemblyLinearVelocity.Magnitude > 20 then
+            return v
+        end
     end
     return nil
 end
@@ -196,9 +187,14 @@ local function SendClick(isClashing, ball)
     LastClick = now
     LastBallHit = ball
 
-    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
-    task.wait(0.01)
-    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+    if SETTINGS.UseMouseClick then
+        mouse1click()
+    else
+        local delay = 0.008 + math.random() * 0.01
+        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+        task.wait(delay)
+        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+    end
 
     task.delay(cd, function()
         IsParrying = false
@@ -284,3 +280,36 @@ Player.CharacterAdded:Connect(function()
     LastBallHit = nil
     IsParrying = false
 end)
+
+local function CreateFloatingButton()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "AeloeToggleGUI"
+    screenGui.Parent = Player.PlayerGui
+
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 50, 0, 50)
+    button.Position = UDim2.new(0, 10, 0, 10)
+    button.Text = "⏺"
+    button.TextScaled = true
+    button.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BorderSizePixel = 0
+    button.Parent = screenGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = button
+
+    button.MouseButton1Click:Connect(function()
+        Window.Enabled = not Window.Enabled
+        if Window.Enabled then
+            button.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+            button.Text = "⏺"
+        else
+            button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+            button.Text = "⏸"
+        end
+    end)
+end
+
+coroutine.wrap(CreateFloatingButton)()
