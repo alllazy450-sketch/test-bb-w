@@ -1,25 +1,15 @@
 -- =====================================================
--- BYPASS ANTI-CHEAT (Dengan pcall agar aman)
+-- BYPASS ANTI-CHEAT
 -- =====================================================
-pcall(function()
-    game:GetService("ReplicatedStorage").Security.RemoteEvent:Destroy()
-end)
-pcall(function()
-    game:GetService("ReplicatedStorage").Security[""]:Destroy()
-end)
-pcall(function()
-    game:GetService("ReplicatedStorage").Security:Destroy()
-end)
-pcall(function()
-    game:GetService("Players").LocalPlayer.PlayerScripts.Client.DeviceChecker:Destroy()
-end)
+pcall(function() game:GetService("ReplicatedStorage").Security.RemoteEvent:Destroy() end)
+pcall(function() game:GetService("ReplicatedStorage").Security[""]:Destroy() end)
+pcall(function() game:GetService("ReplicatedStorage").Security:Destroy() end)
+pcall(function() game:GetService("Players").LocalPlayer.PlayerScripts.Client.DeviceChecker:Destroy() end)
 print("✅ Anti-Cheat bypassed!")
 
 -- =====================================================
--- LOAD FLURIORE-UI
+-- SETTING DEFAULT
 -- =====================================================
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Mc4121ban/Fluriore-UI/main/source.lua"))()
-
 getgenv().Aeloe = {
     AutoParry = true,
     PingBased = true,
@@ -32,141 +22,286 @@ getgenv().Aeloe = {
     Visuals = true,
     UseMouseClick = false
 }
-
 local SETTINGS = getgenv().Aeloe
 
 -- =====================================================
--- BUAT UI DENGAN FLURIORE
+-- BUAT UI CUSTOM (TANPA LIBRARY)
 -- =====================================================
-local Window = Library:MakeGui({
-    NameHub = "Aeloe Parry",
-    Description = "Auto Parry + Anti-Detection",
-    Color = Color3.fromRGB(0, 200, 255)
-})
+local Player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AeloeUI"
+screenGui.Parent = Player.PlayerGui
+screenGui.ResetOnSpawn = false
 
--- Tambahkan drag untuk Window (Fluriore mungkin tidak support drag)
-local function MakeDraggable(guiObject)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 350, 0, 500)
+frame.Position = UDim2.new(0.5, -175, 0.5, -250)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+frame.BorderSizePixel = 0
+frame.BackgroundTransparency = 0.1
+frame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = frame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "Aeloe Parry"
+title.TextColor3 = Color3.fromRGB(0, 200, 255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = frame
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 0)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+closeBtn.TextScaled = true
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.Parent = frame
+closeBtn.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
+
+local scrolling = Instance.new("ScrollingFrame")
+scrolling.Size = UDim2.new(1, -10, 1, -40)
+scrolling.Position = UDim2.new(0, 5, 0, 35)
+scrolling.BackgroundTransparency = 1
+scrolling.CanvasSize = UDim2.new(0, 0, 0, 800)
+scrolling.ScrollBarThickness = 4
+scrolling.Parent = frame
+
+local function addLabel(text, y)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -10, 0, 20)
+    lbl.Position = UDim2.new(0, 5, 0, y)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.TextScaled = true
+    lbl.Font = Enum.Font.Gotham
+    lbl.Parent = scrolling
+    return lbl
+end
+
+local function addToggle(text, default, y, callback)
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, -10, 0, 30)
+    container.Position = UDim2.new(0, 5, 0, y)
+    container.BackgroundTransparency = 1
+    container.Parent = scrolling
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0.7, 0, 1, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextColor3 = Color3.fromRGB(220, 220, 220)
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.TextScaled = true
+    lbl.Font = Enum.Font.Gotham
+    lbl.Parent = container
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 50, 1, -4)
+    btn.Position = UDim2.new(1, -55, 0, 2)
+    btn.BackgroundColor3 = default and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 100, 100)
+    btn.Text = default and "ON" or "OFF"
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextScaled = true
+    btn.Font = Enum.Font.GothamBold
+    btn.BorderSizePixel = 0
+    btn.Parent = container
+    local cornerBtn = Instance.new("UICorner")
+    cornerBtn.CornerRadius = UDim.new(0, 4)
+    cornerBtn.Parent = btn
+
+    local state = default
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.BackgroundColor3 = state and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 100, 100)
+        btn.Text = state and "ON" or "OFF"
+        callback(state)
+    end)
+    return btn
+end
+
+local function addSlider(text, min, max, default, y, callback)
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, -10, 0, 40)
+    container.Position = UDim2.new(0, 5, 0, y)
+    container.BackgroundTransparency = 1
+    container.Parent = scrolling
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, 0, 0, 16)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text .. ": " .. tostring(default)
+    lbl.TextColor3 = Color3.fromRGB(220, 220, 220)
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.TextScaled = true
+    lbl.Font = Enum.Font.Gotham
+    lbl.Parent = container
+
+    local slider = Instance.new("Frame")
+    slider.Size = UDim2.new(1, 0, 0, 10)
+    slider.Position = UDim2.new(0, 0, 0, 20)
+    slider.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+    slider.BorderSizePixel = 0
+    slider.Parent = container
+    local cornerSlide = Instance.new("UICorner")
+    cornerSlide.CornerRadius = UDim.new(0, 4)
+    cornerSlide.Parent = slider
+
+    local fill = Instance.new("Frame")
+    fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+    fill.BorderSizePixel = 0
+    fill.Parent = slider
+    local cornerFill = Instance.new("UICorner")
+    cornerFill.CornerRadius = UDim.new(0, 4)
+    cornerFill.Parent = fill
+
     local dragging = false
-    local dragStart = nil
-    local startPos = nil
+    local function updateSlider(input)
+        local pos = input.Position.X
+        local rel = (pos - slider.AbsolutePosition.X) / slider.AbsoluteSize.X
+        local val = math.clamp(rel, 0, 1) * (max - min) + min
+        val = math.round(val * 100) / 100
+        fill.Size = UDim2.new((val - min) / (max - min), 0, 1, 0)
+        lbl.Text = text .. ": " .. tostring(val)
+        callback(val)
+    end
 
-    local function onInputBegin(input)
+    slider.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
-            dragStart = input.Position
-            startPos = guiObject.Position
+            updateSlider(input)
         end
-    end
-
-    local function onInputChanged(input)
+    end)
+    slider.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            guiObject.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
+            updateSlider(input)
         end
-    end
-
-    local function onInputEnd(input)
+    end)
+    slider.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = false
         end
-    end
-
-    guiObject.InputBegan:Connect(onInputBegin)
-    guiObject.InputChanged:Connect(onInputChanged)
-    guiObject.InputEnded:Connect(onInputEnd)
+    end)
+    return fill
 end
 
--- Terapkan drag ke Window (cari frame utama)
-local function SetupWindowDrag()
-    local windowFrame = Window.Frame or Window._frame or Window
-    if windowFrame and windowFrame:IsA("Frame") then
-        MakeDraggable(windowFrame)
-    end
-end
-coroutine.wrap(SetupWindowDrag)()
+-- =====================================================
+-- BUILD UI KONTROL
+-- =====================================================
+local y = 5
+addLabel("--- Pengaturan Dasar ---", y); y = y + 25
+addToggle("Auto Parry", SETTINGS.AutoParry, y, function(v) SETTINGS.AutoParry = v end); y = y + 35
+addToggle("Prediksi Ping", SETTINGS.PingBased, y, function(v) SETTINGS.PingBased = v end); y = y + 35
+addSlider("Offset Ping", 1, 3, SETTINGS.PingBasedOffset, y, function(v) SETTINGS.PingBasedOffset = v end); y = y + 50
+addSlider("Jarak Parry", 0.1, 2, SETTINGS.DistanceToParry, y, function(v) SETTINGS.DistanceToParry = v end); y = y + 50
+addSlider("Radius Darurat", 1, 20, SETTINGS.EmergencyRadius, y, function(v) SETTINGS.EmergencyRadius = v end); y = y + 50
+
+addLabel("--- Pengaturan Lanjutan ---", y); y = y + 25
+addSlider("Jarak Clash", 5, 30, SETTINGS.ClashDistance, y, function(v) SETTINGS.ClashDistance = v end); y = y + 50
+addSlider("Kecepatan Clash", 0.001, 0.1, SETTINGS.ClashSpeed, y, function(v) SETTINGS.ClashSpeed = v end); y = y + 50
+addSlider("Kecepatan Normal", 0.01, 0.2, SETTINGS.NormalSpeed, y, function(v) SETTINGS.NormalSpeed = v end); y = y + 50
+addToggle("Visual Lingkaran", SETTINGS.Visuals, y, function(v)
+    SETTINGS.Visuals = v
+    if not v and _G.AeloeCircle then _G.AeloeCircle.Transparency = 1 end
+end); y = y + 35
+addToggle("Gunakan mouse1click()", SETTINGS.UseMouseClick, y, function(v) SETTINGS.UseMouseClick = v end); y = y + 35
+
+scrolling.CanvasSize = UDim2.new(0, 0, 0, y + 20)
 
 -- =====================================================
--- TAB & KONTROL UI
+-- DRAG UNTUK FRAME
 -- =====================================================
-local MainTab = Window:CreateTab({ Name = "Utama", Icon = "rbxassetid://16932740082" })
-
-local BasicSection = MainTab:AddSection("Pengaturan Dasar")
-BasicSection:AddToggle({
-    Title = "Auto Parry",
-    Content = "Aktif/nonaktifkan parry",
-    Default = SETTINGS.AutoParry,
-    Callback = function(v) SETTINGS.AutoParry = v end
-})
-BasicSection:AddToggle({
-    Title = "Prediksi Ping",
-    Content = "Sesuaikan timing dengan ping",
-    Default = SETTINGS.PingBased,
-    Callback = function(v) SETTINGS.PingBased = v end
-})
-BasicSection:AddSlider({
-    Title = "Offset Ping",
-    Content = "Pengali prediksi ping",
-    Min = 1.0, Max = 3.0,
-    Default = SETTINGS.PingBasedOffset,
-    Callback = function(v) SETTINGS.PingBasedOffset = v end
-})
-BasicSection:AddSlider({
-    Title = "Jarak Parry",
-    Content = "Semakin kecil semakin akurat",
-    Min = 0.1, Max = 2.0,
-    Default = SETTINGS.DistanceToParry,
-    Callback = function(v) SETTINGS.DistanceToParry = v end
-})
-BasicSection:AddSlider({
-    Title = "Radius Darurat",
-    Content = "Paksa parry jika bola terlalu dekat",
-    Min = 1, Max = 20,
-    Default = SETTINGS.EmergencyRadius,
-    Callback = function(v) SETTINGS.EmergencyRadius = v end
-})
-
-local AdvancedSection = MainTab:AddSection("Pengaturan Lanjutan")
-AdvancedSection:AddSlider({
-    Title = "Jarak Clash",
-    Content = "Deteksi clash (8-12 disarankan)",
-    Min = 5, Max = 30,
-    Default = SETTINGS.ClashDistance,
-    Callback = function(v) SETTINGS.ClashDistance = v end
-})
-AdvancedSection:AddSlider({
-    Title = "Kecepatan Clash",
-    Content = "Cooldown saat clash (detik)",
-    Min = 0.001, Max = 0.1,
-    Default = SETTINGS.ClashSpeed,
-    Callback = function(v) SETTINGS.ClashSpeed = v end
-})
-AdvancedSection:AddSlider({
-    Title = "Kecepatan Normal",
-    Content = "Cooldown normal (detik)",
-    Min = 0.01, Max = 0.2,
-    Default = SETTINGS.NormalSpeed,
-    Callback = function(v) SETTINGS.NormalSpeed = v end
-})
-AdvancedSection:AddToggle({
-    Title = "Visual Lingkaran",
-    Content = "Tampilkan indikator",
-    Default = SETTINGS.Visuals,
-    Callback = function(v)
-        SETTINGS.Visuals = v
-        if not v and _G.AeloeCircle then _G.AeloeCircle.Transparency = 1 end
+local draggingMain = false
+local dragStartMain = nil
+local startPosMain = nil
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingMain = true
+        dragStartMain = input.Position
+        startPosMain = frame.Position
     end
-})
-AdvancedSection:AddToggle({
-    Title = "Gunakan mouse1click()",
-    Content = "Coba jika VirtualInputManager terdeteksi",
-    Default = SETTINGS.UseMouseClick,
-    Callback = function(v) SETTINGS.UseMouseClick = v end
-})
+end)
+frame.InputChanged:Connect(function(input)
+    if draggingMain and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStartMain
+        frame.Position = UDim2.new(
+            startPosMain.X.Scale,
+            startPosMain.X.Offset + delta.X,
+            startPosMain.Y.Scale,
+            startPosMain.Y.Offset + delta.Y
+        )
+    end
+end)
+frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingMain = false
+    end
+end)
+
+-- =====================================================
+-- FLOATING BUTTON (TOGGLE UI)
+-- =====================================================
+local floatBtn = Instance.new("TextButton")
+floatBtn.Size = UDim2.new(0, 50, 0, 50)
+floatBtn.Position = UDim2.new(0, 10, 0, 10)
+floatBtn.Text = "⏺"
+floatBtn.TextScaled = true
+floatBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+floatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+floatBtn.BorderSizePixel = 0
+floatBtn.Parent = screenGui
+local cornerFloat = Instance.new("UICorner")
+cornerFloat.CornerRadius = UDim.new(1, 0)
+cornerFloat.Parent = floatBtn
+
+local draggingFloat = false
+local dragStartFloat = nil
+local startPosFloat = nil
+floatBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingFloat = true
+        dragStartFloat = input.Position
+        startPosFloat = floatBtn.Position
+    end
+end)
+floatBtn.InputChanged:Connect(function(input)
+    if draggingFloat and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStartFloat
+        floatBtn.Position = UDim2.new(
+            startPosFloat.X.Scale,
+            startPosFloat.X.Offset + delta.X,
+            startPosFloat.Y.Scale,
+            startPosFloat.Y.Offset + delta.Y
+        )
+    end
+end)
+floatBtn.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingFloat = false
+    end
+end)
+
+floatBtn.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+    if frame.Visible then
+        floatBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+        floatBtn.Text = "⏺"
+    else
+        floatBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        floatBtn.Text = "⏸"
+    end
+end)
 
 -- =====================================================
 -- CORE SCRIPT (AUTO PARRY)
@@ -355,45 +490,5 @@ Player.CharacterAdded:Connect(function()
     LastBallHit = nil
     IsParrying = false
 end)
-
--- =====================================================
--- FLOATING BUTTON UNTUK TOGGLE UI (DENGAN DRAG)
--- =====================================================
-local function CreateFloatingButton()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "AeloeToggleGUI"
-    screenGui.Parent = Player.PlayerGui
-    screenGui.ResetOnSpawn = false
-
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 50, 0, 50)
-    button.Position = UDim2.new(0, 10, 0, 10)
-    button.Text = "⏺"
-    button.TextScaled = true
-    button.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.BorderSizePixel = 0
-    button.Parent = screenGui
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
-    corner.Parent = button
-
-    -- Drag untuk floating button
-    MakeDraggable(button)
-
-    button.MouseButton1Click:Connect(function()
-        Window.Enabled = not Window.Enabled
-        if Window.Enabled then
-            button.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
-            button.Text = "⏺"
-        else
-            button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-            button.Text = "⏸"
-        end
-    end)
-end
-
-coroutine.wrap(CreateFloatingButton)()
 
 print("✅ Aeloe Parry loaded! Tekan L untuk toggle Auto Parry.")
