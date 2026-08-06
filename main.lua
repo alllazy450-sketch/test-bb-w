@@ -1,11 +1,63 @@
 -- =====================================================
--- BYPASS ANTI-CHEAT
+-- BYPASS ANTI-CHEAT VIA REMOTE INTERCEPT
 -- =====================================================
-pcall(function() game:GetService("ReplicatedStorage").Security.RemoteEvent:Destroy() end)
-pcall(function() game:GetService("ReplicatedStorage").Security[""]:Destroy() end)
-pcall(function() game:GetService("ReplicatedStorage").Security:Destroy() end)
-pcall(function() game:GetService("Players").LocalPlayer.PlayerScripts.Client.DeviceChecker:Destroy() end)
-print("✅ Anti-Cheat bypassed!")
+print("🛡️ Mengaktifkan bypass via Remote...")
+
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local players = game:GetService("Players")
+local localPlayer = players.LocalPlayer
+
+-- Fungsi untuk menghancurkan remote yang mencurigakan
+local function destroySecurityRemotes()
+    local security = replicatedStorage:FindFirstChild("Security")
+    if security then
+        for _, child in pairs(security:GetChildren()) do
+            if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") then
+                child:Destroy()
+            end
+        end
+        security:Destroy()
+    end
+    -- Destroy remote spesifik jika ada
+    pcall(function()
+        replicatedStorage.Security.RemoteEvent:Destroy()
+        replicatedStorage.Security[""]:Destroy()
+    end)
+end
+
+-- Intercept remote baru yang dibuat (hook)
+local function hookRemoteCreation()
+    local meta = getrawmetatable(game)
+    local oldNamecall = meta.__namecall
+    setreadonly(meta, false)
+    meta.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        if method == "FindFirstChild" or method == "WaitForChild" then
+            local result = oldNamecall(self, ...)
+            if result and (result:IsA("RemoteEvent") or result:IsA("RemoteFunction")) then
+                -- Jika remote mengandung kata "Security" atau "Anti", hancurkan
+                if result.Name:lower():find("security") or result.Name:lower():find("anti") then
+                    result:Destroy()
+                    return nil
+                end
+            end
+            return result
+        end
+        return oldNamecall(self, ...)
+    end)
+    setreadonly(meta, true)
+end
+
+-- Matikan DeviceChecker
+pcall(function()
+    local deviceChecker = localPlayer.PlayerScripts:FindFirstChild("Client"):FindFirstChild("DeviceChecker")
+    if deviceChecker then deviceChecker:Destroy() end
+end)
+
+-- Eksekusi bypass
+destroySecurityRemotes()
+hookRemoteCreation()
+print("✅ Anti-Cheat bypassed via Remote Intercept!")
 
 -- =====================================================
 -- SETTING DEFAULT
@@ -25,12 +77,11 @@ getgenv().Aeloe = {
 local SETTINGS = getgenv().Aeloe
 
 -- =====================================================
--- BUAT UI CUSTOM (TANPA LIBRARY)
+-- BUAT UI CUSTOM
 -- =====================================================
-local Player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "AeloeUI"
-screenGui.Parent = Player.PlayerGui
+screenGui.Parent = localPlayer.PlayerGui
 screenGui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame")
@@ -48,7 +99,7 @@ corner.Parent = frame
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundTransparency = 1
-title.Text = "Aeloe Parry"
+title.Text = "Aeloe Parry [Remote Bypass]"
 title.TextColor3 = Color3.fromRGB(0, 200, 255)
 title.TextScaled = true
 title.Font = Enum.Font.GothamBold
@@ -196,9 +247,7 @@ local function addSlider(text, min, max, default, y, callback)
     return fill
 end
 
--- =====================================================
--- BUILD UI KONTROL
--- =====================================================
+-- BUILD UI
 local y = 5
 addLabel("--- Pengaturan Dasar ---", y); y = y + 25
 addToggle("Auto Parry", SETTINGS.AutoParry, y, function(v) SETTINGS.AutoParry = v end); y = y + 35
@@ -219,9 +268,7 @@ addToggle("Gunakan mouse1click()", SETTINGS.UseMouseClick, y, function(v) SETTIN
 
 scrolling.CanvasSize = UDim2.new(0, 0, 0, y + 20)
 
--- =====================================================
--- DRAG UNTUK FRAME
--- =====================================================
+-- DRAG FRAME
 local draggingMain = false
 local dragStartMain = nil
 local startPosMain = nil
@@ -249,9 +296,7 @@ frame.InputEnded:Connect(function(input)
     end
 end)
 
--- =====================================================
--- FLOATING BUTTON (TOGGLE UI)
--- =====================================================
+-- FLOATING BUTTON
 local floatBtn = Instance.new("TextButton")
 floatBtn.Size = UDim2.new(0, 50, 0, 50)
 floatBtn.Position = UDim2.new(0, 10, 0, 10)
@@ -304,7 +349,7 @@ floatBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =====================================================
--- CORE SCRIPT (AUTO PARRY)
+-- CORE AUTO PARRY
 -- =====================================================
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
